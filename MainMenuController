@@ -1,0 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+
+
+public class MainMenuController : MonoBehaviour
+{
+
+
+    public void PlayGame()
+    {
+
+        //you can put Unity.EventSystems; at the top instead of here, but that would use the whole library for one task.
+        int selectedCharacter = int.Parse(UnityEngine.EventSystems.EventSystem.current.currentSelectedGameObject.name);
+        //Parse converts numbers in a string, to integers! (that is why i named my buttons 0 and 1)
+
+        GameManager.instance.CharIndex = selectedCharacter;
+
+        SceneManager.LoadScene("GamePlay");
+
+    }
+
+
+}
