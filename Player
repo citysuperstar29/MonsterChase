@@ -1,0 +1,100 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Player : MonoBehaviour
+{
+
+    public float moveForce = 10f;
+    public float jumpForce = 11f;
+
+    private float movementX;
+
+
+    //different components on the player
+
+    //the rigidbody
+    [SerializeField]
+    private Rigidbody2D myBody;
+
+    //the sprite
+    private SpriteRenderer sr;
+
+    //the animations
+    private Animator anim;
+    private string WALK_ANIMATION = "Walk";
+
+    private bool isGrounded;
+    private string GROUND_TAG = "Ground";
+
+    private string ENEMY_TAG = "Enemy";
+
+    private void Awake()
+    {
+        myBody = GetComponent<Rigidbody2D>();
+        anim = GetComponent<Animator>();
+
+        sr = GetComponent<SpriteRenderer>();
+    }
+
+    void Update()
+    {
+        PlayerMoveKeyboard();
+        AnimatePlayer();
+        PlayerJump();
+    }
+
+    void PlayerMoveKeyboard()
+    {
+        //moving left and right
+        movementX = Input.GetAxisRaw("Horizontal");
+
+        transform.position += new Vector3(movementX, 0f, 0f) * moveForce * Time.deltaTime;
+
+    }
+
+    void AnimatePlayer()
+    {
+        if(movementX > 0)
+        {
+            anim.SetBool(WALK_ANIMATION, true); //if walk animation is true AND you are moving to the RIGHT, dont flip the sprite
+            sr.flipX = false;
+        }
+        else if(movementX < 0)
+        {
+            anim.SetBool(WALK_ANIMATION, true); //if walk animation is true AND you are moving to the LEFT, flip the sprite
+            sr.flipX = true;
+        }
+        else
+        {
+            anim.SetBool(WALK_ANIMATION, false); //if not walking then dont flip the sprite :P 5-head
+        }
+        
+
+    }
+
+    void PlayerJump()
+    {
+        //if hitting jump button and is on the ground, you jump
+        if(Input.GetButtonDown("Jump") && isGrounded)
+        {
+            isGrounded = false;
+            myBody.AddForce(new Vector2(0f, jumpForce), ForceMode2D.Impulse);
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        //if is colliding with the ground. Is grounded is true.
+        if (collision.gameObject.CompareTag(GROUND_TAG))
+        {
+            isGrounded = true;
+        }
+
+        if(collision.gameObject.CompareTag(ENEMY_TAG))
+        {
+            Destroy(gameObject); //the player gets destroyed
+        }
+    }
+
+}
